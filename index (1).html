@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avify — ¿Es segura esta tienda?</title>
+<meta name="description" content="Pega el link de una tienda online y verifica su confiabilidad antes de comprar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F1320;--ink-2:#171C2E;--paper:#F6F2E7;--paper-2:#EDE6D4;
+    --gold:#C99A3D;--green:#3F9C6D;--amber:#D9A441;--orange:#C97A3A;--red:#C2483A;
+    --gray:#8B92A8;--text-muted:#A6ACC0;
+    --display:'Space Grotesk',sans-serif;--body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  body::before{content:"";position:fixed;inset:0;background:radial-gradient(800px 500px at 15% -10%,rgba(201,154,61,0.10),transparent 60%),radial-gradient(700px 600px at 100% 10%,rgba(63,156,109,0.07),transparent 55%);pointer-events:none;z-index:0;}
+  .wrap{max-width:720px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:28px 0 0;}
+  .wordmark{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:0.01em;display:flex;align-items:center;gap:8px;}
+  .wordmark .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);}
+  .tag{font-family:var(--mono);font-size:11px;color:var(--text-muted);border:1px solid rgba(166,172,192,0.25);padding:4px 10px;border-radius:100px;letter-spacing:0.04em;}
+  .hero{padding:72px 0 28px;}
+  .eyebrow{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin:0 0 14px;}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-0.01em;margin:0 0 16px;}
+  h1 em{font-style:normal;color:var(--gold);}
+  .lede{font-size:17px;color:var(--text-muted);line-height:1.55;max-width:480px;margin:0 0 36px;}
+  form.checker{display:flex;gap:10px;flex-wrap:wrap;}
+  .input-shell{flex:1;min-width:240px;position:relative;background:rgba(246,242,231,0.04);border:1px solid rgba(246,242,231,0.16);border-radius:10px;transition:border-color .2s ease,background .2s ease;}
+  .input-shell:focus-within{border-color:var(--gold);background:rgba(201,154,61,0.06);}
+  .input-shell input{width:100%;background:none;border:none;outline:none;color:var(--paper);font-family:var(--mono);font-size:15px;padding:16px 16px;}
+  .input-shell input::placeholder{color:rgba(166,172,192,0.55);}
+  button.cta{font-family:var(--body);font-weight:600;font-size:15px;background:var(--gold);color:var(--ink);border:none;border-radius:10px;padding:0 26px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform .15s ease,background .15s ease;}
+  button.cta:hover{background:#DCAE52;}
+  button.cta:active{transform:scale(0.97);}
+  button.cta:disabled{opacity:0.55;cursor:default;transform:none;}
+  .hint{font-size:13px;color:rgba(166,172,192,0.7);margin-top:12px;}
+  #result-zone{margin-top:44px;min-height:4px;}
+  .skeleton{background:rgba(246,242,231,0.04);border:1px solid rgba(246,242,231,0.1);border-radius:14px;padding:28px;font-family:var(--mono);font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:12px;}
+  .skeleton .spinner{flex-shrink:0;width:14px;height:14px;border-radius:50%;border:2px solid rgba(166,172,192,0.3);border-top-color:var(--gold);animation:spin 0.8s linear infinite;}
+  .skeleton .steps{display:flex;flex-direction:column;gap:4px;}
+  .skeleton .step-label{font-size:13px;}
+  .skeleton .step-sub{font-size:11px;color:rgba(166,172,192,0.5);}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .card{position:relative;background:var(--paper);color:var(--ink);border-radius:14px;padding:32px 28px 26px;box-shadow:0 20px 50px -20px rgba(0,0,0,0.6);animation:rise .45s cubic-bezier(.2,.8,.2,1) both;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .card .domain{font-family:var(--mono);font-size:13px;color:#6b7280;word-break:break-all;margin:0 0 4px;}
+  .card .store-name{font-family:var(--display);font-weight:700;font-size:22px;margin:0 0 18px;padding-right:90px;}
+  .seal{position:absolute;top:-16px;right:24px;width:78px;height:78px;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:50%;font-family:var(--display);font-weight:700;color:#fff;box-shadow:0 8px 20px -6px rgba(0,0,0,0.45);animation:stamp .5s cubic-bezier(.3,1.6,.5,1) both;animation-delay:.15s;transform:scale(0) rotate(-18deg);}
+  @keyframes stamp{0%{transform:scale(0) rotate(-18deg);opacity:0;}60%{transform:scale(1.12) rotate(4deg);opacity:1;}100%{transform:scale(1) rotate(-8deg);opacity:1;}}
+  .seal::before{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px dashed currentColor;opacity:0.5;}
+  .seal .score{font-size:20px;line-height:1;}
+  .seal .lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.04em;margin-top:2px;text-transform:uppercase;}
+  .seal.green{background:var(--green);color:#103021;}
+  .seal.gray{background:#9aa0b3;color:#1c2030;}
+  .seal.orange{background:var(--orange);color:#2e1607;}
+  .seal.red{background:var(--red);color:#2b0a05;}
+  .badge-row{display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+  .badge-pill{font-family:var(--mono);font-size:12px;font-weight:700;padding:5px 12px;border-radius:100px;letter-spacing:0.02em;}
+  .badge-pill.green{background:rgba(63,156,109,0.15);color:#1f6b46;}
+  .badge-pill.gray{background:rgba(107,114,128,0.15);color:#4b5263;}
+  .badge-pill.orange{background:rgba(201,122,58,0.15);color:#8a4a1c;}
+  .badge-pill.red{background:rgba(194,72,58,0.15);color:#8a2c20;}
+  .reasons{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:7px;}
+  .reasons li{font-size:14px;line-height:1.45;display:flex;gap:8px;color:#374151;}
+  .reasons li.flag{color:#8a2c20;}
+  .reasons li::before{content:"·";font-weight:700;color:#b08328;}
+  .message-box{font-size:14px;line-height:1.55;color:#4b5263;background:rgba(0,0,0,0.035);border-left:3px solid var(--gold);padding:12px 14px;border-radius:6px;margin-bottom:18px;}
+  .fine-print{border-top:1px dashed rgba(0,0,0,0.15);padding-top:14px;margin-top:6px;font-size:11.5px;line-height:1.5;color:#8b8f99;}
+  .error-card{background:rgba(194,72,58,0.08);border:1px solid rgba(194,72,58,0.3);border-radius:10px;padding:18px 20px;font-size:14px;color:#e8a79c;}
+  .checks{padding:64px 0 40px;}
+  .checks h2{font-family:var(--display);font-weight:600;font-size:20px;margin:0 0 22px;}
+  .check-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  @media (max-width:520px){.check-grid{grid-template-columns:1fr;}}
+  .check-item{border:1px solid rgba(246,242,231,0.12);border-radius:10px;padding:16px 16px;}
+  .check-item .k{font-family:var(--mono);font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:block;}
+  .check-item p{margin:0;font-size:13.5px;color:var(--text-muted);line-height:1.5;}
+  footer{padding:34px 0 50px;border-top:1px solid rgba(246,242,231,0.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--text-muted);}
+  footer a{color:var(--text-muted);}
+  @media (prefers-reduced-motion:reduce){.card,.seal{animation:none;}.skeleton .spinner{animation:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="wordmark"><span class="dot"></span>avify</div>
+    <span class="tag">verificación de tiendas</span>
+  </header>
+  <section class="hero">
+    <p class="eyebrow">Antes de pagar, verifica</p>
+    <h1>¿Es segura<br>esta <em>tienda</em>?</h1>
+    <p class="lede">Pega el link de la tienda online donde vas a comprar. Revisamos señales públicas de confiabilidad en segundos — gratis, sin registro.</p>
+    <form class="checker" id="checkerForm">
+      <div class="input-shell">
+        <input type="text" id="domainInput" name="domain" placeholder="tienda-ejemplo.com" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+      </div>
+      <button class="cta" id="submitBtn" type="submit">Verificar →</button>
+    </form>
+    <p class="hint">Funciona con cualquier tienda online. No necesitas crear cuenta.</p>
+    <div id="result-zone"></div>
+  </section>
+  <section class="checks">
+    <h2>Qué revisamos</h2>
+    <div class="check-grid">
+      <div class="check-item"><span class="k">Dominio</span><p>Antigüedad del sitio, certificado de seguridad y si el registro luce sospechoso.</p></div>
+      <div class="check-item"><span class="k">Reputación</span><p>Reportes de otros compradores y presencia verificable del negocio.</p></div>
+      <div class="check-item"><span class="k">Páginas legales</span><p>Si la tienda tiene contacto real, política de devoluciones y términos claros.</p></div>
+      <div class="check-item"><span class="k">Patrones de riesgo</span><p>Señales típicas de tiendas creadas solo para vender una vez y desaparecer.</p></div>
+    </div>
+  </section>
+  <footer>
+    <span>avify.online — análisis algorítmico orientativo, no un veredicto legal.</span>
+    <span>hecho en Cuenca, Ecuador</span>
+  </footer>
+</div>
+<script>
+  const API_URL    = 'https://atlasx-n8n.ssjlyd.easypanel.host/webhook/verifika-check';
+  const RESULT_URL = 'https://atlasx-n8n.ssjlyd.easypanel.host/webhook/verifika-result';
+
+  const form   = document.getElementById('checkerForm');
+  const input  = document.getElementById('domainInput');
+  const btn    = document.getElementById('submitBtn');
+  const zone   = document.getElementById('result-zone');
+
+  function uuid(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);});}
+  let sessionId = sessionStorage.getItem('avify_sid');
+  if(!sessionId){sessionId=uuid();sessionStorage.setItem('avify_sid',sessionId);}
+
+  function escapeHtml(str){const d=document.createElement('div');d.textContent=str??'';return d.innerHTML;}
+  function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+  function extractDomain(v){return v.toLowerCase().replace(/^https?:\/\//,'').replace(/^www\./,'').split('/')[0].split('?')[0].split(':')[0];}
+
+  const pollingMessages = [
+    'Consultando registro del dominio…',
+    'Verificando certificado de seguridad…',
+    'Analizando estructura del sitio…',
+    'Buscando páginas legales…',
+    'Calculando score de confianza…',
+    'Casi listo…'
+  ];
+
+  function renderLoading(msg, sub){
+    zone.innerHTML = `
+      <div class="skeleton">
+        <span class="spinner"></span>
+        <div class="steps">
+          <span class="step-label">${escapeHtml(msg||'Iniciando verificación…')}</span>
+          ${sub?`<span class="step-sub">${escapeHtml(sub)}</span>`:''}
+        </div>
+      </div>`;
+  }
+
+  function renderError(msg){zone.innerHTML=`<div class="error-card">${escapeHtml(msg)}</div>`;}
+
+  function renderResult(data){
+    const color   = data.trust_color||'gray';
+    const label   = data.trust_label_human||'Sin verificar';
+    const domain  = data.domain||'';
+    const score   = (data.trust_score===null||data.trust_score===undefined)?'—':data.trust_score;
+    const reasons = (data.trust_reasons||[]).map(r=>`<li>${escapeHtml(r)}</li>`).join('');
+    const flags   = (data.red_flags||[]).map(r=>`<li class="flag">${escapeHtml(r)}</li>`).join('');
+    const msgBlock= data.message?`<div class="message-box">${escapeHtml(data.message)}</div>`:'';
+    zone.innerHTML=`
+      <div class="card">
+        <div class="seal ${color}"><span class="score">${score}</span><span class="lbl">score</span></div>
+        <p class="domain">${escapeHtml(domain)}</p>
+        <h3 class="store-name">${escapeHtml(data.store_name||domain)}</h3>
+        <div class="badge-row"><span class="badge-pill ${color}">${escapeHtml(label)}</span></div>
+        ${(reasons||flags)?`<ul class="reasons">${reasons}${flags}</ul>`:''}
+        ${msgBlock}
+        <p class="fine-print">${escapeHtml(data.disclaimer||'')}</p>
+      </div>`;
+  }
+
+  async function pollForResult(domain){
+    const MAX = 15;
+    for(let i=0;i<MAX;i++){
+      renderLoading(pollingMessages[Math.min(i,pollingMessages.length-1)], domain);
+      await sleep(2000);
+      try{
+        const res  = await fetch(RESULT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain})});
+        const text = await res.text();
+        const data = JSON.parse(text);
+        if(data.status==='done'){
+          renderResult(data);
+          return;
+        }
+      }catch(e){}
+    }
+    renderError('La verificación está tardando más de lo esperado. Intenta de nuevo en unos segundos.');
+  }
+
+  form.addEventListener('submit', async(e)=>{
+    e.preventDefault();
+    const value = input.value.trim();
+    if(!value)return;
+    btn.disabled=true;
+    btn.textContent='Verificando…';
+    renderLoading('Iniciando verificación…');
+    try{
+      const res  = await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'url',value,session_id:sessionId,country:'EC'})});
+      const text = await res.text();
+      const data = JSON.parse(text);
+      if(data.rate_limited){
+        renderError(data.error||'Demasiadas solicitudes. Intenta de nuevo en unos minutos.');
+      } else if(data.status==='processing'){
+        await pollForResult(data.domain||extractDomain(value));
+      } else if(!data.ok){
+        renderError(data.error||'No pudimos procesar esa entrada. Revisa el link e intenta de nuevo.');
+      } else {
+        renderResult(data);
+      }
+    }catch(err){
+      renderError('No pudimos conectar con el verificador. Intenta de nuevo en un momento.');
+    }finally{
+      btn.disabled=false;
+      btn.textContent='Verificar →';
+    }
+  });
+</script>
+</body>
+</html>
